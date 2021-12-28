@@ -17,7 +17,7 @@ public class Application {
                 break;
             }
             switch (input) {
-                case "1" -> BS.printData("Search book by name:", BS.searchBook(BS.inputBookName(), 2));
+                case "1" -> BS.printData("Search book by name:", BS.searchBook(BS.inputBookTitle(), 2));
                 case "2" -> BS.addBook();
                 case "3" -> { try {BS.removeBook(BS.searchBook(BS.inputBookIsbn(), 1).get(0));}
                               catch (Exception e){ System.out.println("Book not found");} }

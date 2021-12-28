@@ -1,11 +1,10 @@
 package lv.sda.books;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 public class Bookstore{
     static Scanner scanner = new Scanner(System.in);
     final String filePath = "src/main/resources/books.txt";
-    final String filePath2 = "src/main/resources/books2.txt";
     final String INV = "Invalid input";
     private List<Book> books;
     public Bookstore(){
@@ -40,28 +38,25 @@ public class Bookstore{
     }
 
     //Search book
-    //TODO - ignore special characters
+    //Action:
+    //0 - Return all books
+    //1 - Search by ISBN
+    //2 - Search by Title
     public List<Book> searchBook(String query, int action) {
-        List<Book> booksByValue = new ArrayList<>();
         switch (action) {
+            case 0 -> { return books; }
             case 1 -> {
                 if (query.equals(INV)) {
                     System.out.println(INV);
                     return Collections.emptyList();
-                } else {
-                    for (Book book : books) if (book.getIsbn().equals(query)) booksByValue.add(book);
-                    return booksByValue;}
-                }
-            case 2 -> {
-                for (Book book : books) if (book.getTitle().equalsIgnoreCase(query)) booksByValue.add(book);
-                return booksByValue;
-            }
+                } else { return books.stream().filter(e->e.getIsbn().equals(query)).collect(Collectors.toList());} }
+            case 2 -> {  return books.stream().filter(e->e.getTitle().equalsIgnoreCase(query)).collect(Collectors.toList()); }
         }
-        return books;
+        return Collections.emptyList();
     }
 
-    public String inputBookName(){
-        System.out.println("Enter book name:");
+    public String inputBookTitle(){
+        System.out.println("Enter book Title:");
         return scanner.nextLine();
     }
 
@@ -73,31 +68,24 @@ public class Bookstore{
 
     // Add new book
     public void addBook() {
-        //Book newBook = new Book("100", "Title", "Description", "Author", "publisher", 1000, LocalDate.of(2020, 1, 1));
         Book newBook = new Book();
         System.out.println("Add book");
 
-        System.out.println("Enter isbn:");
-        String myInput = scanner.nextLine();
-        if (isValidInput09(myInput)) newBook.setIsbn(myInput);
-        else System.out.println(INV);
+        if (inputBookIsbn().equals(INV)) {System.out.println(INV); return;} else newBook.setIsbn(inputBookIsbn());
 
-        System.out.println("Enter Title:");
-        myInput = scanner.nextLine();
-        newBook.setTitle(myInput);
+        newBook.setTitle(inputBookTitle());
 
         System.out.println("Enter Description:");
-        myInput = scanner.nextLine();
-        newBook.setDescription(myInput);
+        newBook.setDescription(scanner.nextLine());
 
         System.out.println("Enter Author:");
-        myInput = scanner.nextLine();
+        String myInput = scanner.nextLine();
         if (isValidInputAZ(myInput)) newBook.setAuthor(myInput);
         else System.out.println(INV);
+        if (inputBookTitle().equals(INV)) {System.out.println(INV); return;} else newBook.setTitle(inputBookTitle());
 
         System.out.println("Enter Publisher:");
-        myInput = scanner.nextLine();
-        newBook.setPublisher(myInput);
+        newBook.setPublisher(scanner.nextLine());
 
         System.out.println("Enter number of pages:");
         myInput = scanner.nextLine();
@@ -127,7 +115,7 @@ public class Bookstore{
 
     //Save data
     public void saveData(){
-        try(BufferedWriter out = new BufferedWriter(new FileWriter(filePath2))){
+        try(BufferedWriter out = new BufferedWriter(new FileWriter(filePath))){
             for (Book book: books) out.write(book.toCSV());
             out.close();
             System.out.println("Data saved successfully");
