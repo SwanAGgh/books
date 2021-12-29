@@ -4,7 +4,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,12 +44,11 @@ public class Bookstore{
     public List<Book> searchBook(String query, int action) {
         switch (action) {
             case 0 -> { return books; }
-            case 1 -> {
-                if (query.equals(INV)) {
-                    System.out.println(INV);
-                    return Collections.emptyList();
-                } else { return books.stream().filter(e->e.getIsbn().equals(query)).collect(Collectors.toList());} }
-            case 2 -> {  return books.stream().filter(e->e.getTitle().equalsIgnoreCase(query)).collect(Collectors.toList()); }
+            case 1 -> { if (query.equals(INV)) {
+                        System.out.println(INV);
+                        return Collections.emptyList();
+                        } else { return books.stream().filter(e->e.getIsbn().equals(query)).collect(Collectors.toList());} }
+            case 2 -> { return books.stream().filter(e->e.getTitle().equalsIgnoreCase(query)).collect(Collectors.toList()); }
         }
         return Collections.emptyList();
     }
@@ -67,11 +65,16 @@ public class Bookstore{
     }
 
     // Add new book
-    public void addBook() {
+    public Book newBookInput() {
+
         Book newBook = new Book();
         System.out.println("Add book");
 
-        if (inputBookIsbn().equals(INV)) {System.out.println(INV); return;} else newBook.setIsbn(inputBookIsbn());
+        String myInput = inputBookIsbn();
+        if (myInput.equals(INV)) {
+            System.out.println(INV);
+            return null;}
+        else newBook.setIsbn(myInput);
 
         newBook.setTitle(inputBookTitle());
 
@@ -79,10 +82,9 @@ public class Bookstore{
         newBook.setDescription(scanner.nextLine());
 
         System.out.println("Enter Author:");
-        String myInput = scanner.nextLine();
+        myInput = scanner.nextLine();
         if (isValidInputAZ(myInput)) newBook.setAuthor(myInput);
-        else System.out.println(INV);
-        if (inputBookTitle().equals(INV)) {System.out.println(INV); return;} else newBook.setTitle(inputBookTitle());
+        else {System.out.println(INV); return null;}
 
         System.out.println("Enter Publisher:");
         newBook.setPublisher(scanner.nextLine());
@@ -90,14 +92,20 @@ public class Bookstore{
         System.out.println("Enter number of pages:");
         myInput = scanner.nextLine();
         if (isValidInput09(myInput)) newBook.setPages(Integer.parseInt(myInput));
-        else System.out.println(INV);
+        else {System.out.println(INV); return null;}
 
         System.out.println("Enter publishing year:");
         myInput = scanner.nextLine();
         if (isValidInput09(myInput) && (Calendar.getInstance().get(Calendar.YEAR))-Integer.parseInt(myInput)>=0) newBook.setPublishingYear(LocalDate.of(Integer.parseInt(myInput), 1, 1));
-        else System.out.println(INV);
+        else {System.out.println(INV); return null;}
 
-        books.add(newBook);
+        return newBook;
+    }
+
+
+    // Add new book
+    public void addBook(Book book) {
+        if (book != null) books.add(book);
     }
 
     // Remove book from list
