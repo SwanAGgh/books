@@ -18,7 +18,8 @@ public class Bookstore{
             Path path = Paths.get(filePath);
             books = Files.lines(path)
                     .map(line -> {
-                        List<String> fields = Arrays.stream(line.split(";")).collect(Collectors.toList());
+                        //List<String> fields = Arrays.stream(line.split(";")).collect(Collectors.toList());
+                        List<String> fields = Arrays.stream(line.split(";")).toList();
                         return new Book(
                                 fields.get(0),
                                 fields.get(1),
@@ -37,31 +38,46 @@ public class Bookstore{
     }
 
     //Search book
-    //Action:
-    //0 - Return all books
-    //1 - Search by ISBN
-    //2 - Search by Title
-    public List<Book> searchBook(String query, int action) {
+    public List<Book> searchBook(String query, String action) {
         switch (action) {
-            case 0 -> { return books; }
-            case 1 -> { if (query.equals(INV)) {
+            case "searchAllBooks" -> { return books; }
+            case "searchByIsbn" -> { if (query.equals(INV)) {
                         System.out.println(INV);
                         return Collections.emptyList();
                         } else { return books.stream().filter(e->e.getIsbn().equals(query)).collect(Collectors.toList());} }
-            case 2 -> { return books.stream().filter(e->e.getTitle().equalsIgnoreCase(query)).collect(Collectors.toList()); }
+            case "searchByTitle" -> { return books.stream().filter(e->e.getTitle().equalsIgnoreCase(query)).collect(Collectors.toList()); }
         }
         return Collections.emptyList();
     }
 
-    public String inputBookTitle(){
-        System.out.println("Enter book Title:");
+    public String inputAll(){
         return scanner.nextLine();
     }
 
-    public String inputBookIsbn(){
-        System.out.println("Enter book Isbn:");
-        String myIsbn = scanner.nextLine();
-        return isValidInput09(myIsbn) ? myIsbn : INV;
+    public String inputNumber(){
+        String myInput = INV;
+        while (myInput.equals(INV))
+        {
+            myInput = scanner.nextLine();
+            if (!isValidInput09(myInput)) {
+                System.out.println(INV + ". Enter only numbers!");
+                myInput = INV;
+            } else break;
+        }
+        return myInput;
+    }
+
+    public String inputLetters(){
+        String myInput = INV;
+        while (myInput.equals(INV))
+        {
+            myInput = scanner.nextLine();
+            if (!isValidInputAZ(myInput)) {
+                System.out.println(INV + ". Enter only letters!");
+                myInput = INV;
+            } else break;
+        }
+        return myInput;
     }
 
     // Add new book
@@ -70,34 +86,29 @@ public class Bookstore{
         Book newBook = new Book();
         System.out.println("Add book");
 
-        String myInput = inputBookIsbn();
-        if (myInput.equals(INV)) {
-            System.out.println(INV);
-            return null;}
-        else newBook.setIsbn(myInput);
+        System.out.println("Enter book Isbn:");
+        newBook.setIsbn(inputNumber());
 
-        newBook.setTitle(inputBookTitle());
+        System.out.println("Enter book Title:");
+        newBook.setTitle(inputAll());
 
         System.out.println("Enter Description:");
-        newBook.setDescription(scanner.nextLine());
+        newBook.setDescription(inputAll());
 
         System.out.println("Enter Author:");
-        myInput = scanner.nextLine();
-        if (isValidInputAZ(myInput)) newBook.setAuthor(myInput);
-        else {System.out.println(INV); return null;}
+        newBook.setAuthor(inputLetters());
 
         System.out.println("Enter Publisher:");
-        newBook.setPublisher(scanner.nextLine());
+        newBook.setPublisher(inputAll());
 
         System.out.println("Enter number of pages:");
-        myInput = scanner.nextLine();
-        if (isValidInput09(myInput)) newBook.setPages(Integer.parseInt(myInput));
-        else {System.out.println(INV); return null;}
+        newBook.setPages(Integer.parseInt(inputNumber()));
 
         System.out.println("Enter publishing year:");
-        myInput = scanner.nextLine();
-        if (isValidInput09(myInput) && (Calendar.getInstance().get(Calendar.YEAR))-Integer.parseInt(myInput)>=0) newBook.setPublishingYear(LocalDate.of(Integer.parseInt(myInput), 1, 1));
-        else {System.out.println(INV); return null;}
+        newBook.setPublishingYear(LocalDate.of(Integer.parseInt(inputNumber()), 1, 1));
+
+        //if (isValidInput09(myInput) && (Calendar.getInstance().get(Calendar.YEAR))-Integer.parseInt(myInput)>=0) newBook.setPublishingYear(LocalDate.of(Integer.parseInt(myInput), 1, 1));
+        //else {System.out.println(INV); return null;}
 
         return newBook;
     }

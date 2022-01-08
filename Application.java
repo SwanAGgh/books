@@ -17,12 +17,12 @@ public class Application {
                 break;
             }
             switch (input) {
-                case "1" -> BS.printData("Search book by name:", BS.searchBook(BS.inputBookTitle(), 2));
+                case "1" -> BS.printData("Search book by name:", BS.searchBook(BS.inputBookTitle(), "searchByTitle"));
                 case "2" -> BS.addBook(BS.newBookInput());
-                case "3" -> { try {BS.removeBook(BS.searchBook(BS.inputBookIsbn(), 1).get(0));}
+                case "3" -> { try {BS.removeBook(BS.searchBook(BS.inputNumber(), "searchByIsbn").get(0));}
                               catch (Exception e){ System.out.println("Book not found");} }
-                case "4" -> BS.printData("Search book by isbn nr.:", BS.searchBook(BS.inputBookIsbn(), 1));
-                case "5" -> BS.printData("List of all books:", BS.searchBook("", 0));
+                case "4" -> BS.printData("Search book by isbn nr.:", BS.searchBook(BS.inputNumber(), "searchByIsbn"));
+                case "5" -> BS.printData("List of all books:", BS.searchBook("", "searchAllBooks"));
                 case "6" -> BS.saveData();
             }
         }
